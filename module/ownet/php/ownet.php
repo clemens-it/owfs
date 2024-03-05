@@ -127,7 +127,7 @@ class OWNet
 
     public function getTimeout()
     {
-        return($this->timeout);
+        return $this->timeout;
     }
 
     public function setUseSwigDir($use)
@@ -137,7 +137,7 @@ class OWNet
 
     public function getUseSwigDir()
     {
-        return($this->use_swig_dir);
+        return $this->use_swig_dir;
     }
 
     public function setHost($host = '')
@@ -166,17 +166,17 @@ class OWNet
         }
 
         $this->link_connected        = false;
-        return(true);
+        return true;
     }
 
     public function getHost()
     {
         // return and URI that can be used with setHost again
         if ($this->link_type == OWNET_LINK_TYPE_STREAM) {
-            return('ow-stream'.($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '').'://'.$this->host.':'.$this->port);    // using streams
+            return 'ow-stream'.($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '').'://'.$this->host.':'.$this->port;  // using streams
         }
 
-        return('ow'.($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '').'://'.$this->host.':'.$this->port);            // using sockets if possible
+        return 'ow'.($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '').'://'.$this->host.':'.$this->port;   // using sockets if possible
     }
 
     protected function pack_htonl($val)
@@ -187,7 +187,7 @@ class OWNet
         $b2    = bindec(substr($bval, 8, 8));
         $b3    = bindec(substr($bval, 16, 8));
         $b4    = bindec(substr($bval, 24, 8));
-        return(chr($b1).chr($b2).chr($b3).chr($b4));
+        return chr($b1).chr($b2).chr($b3).chr($b4);
     }
 
     protected function unpack_ntohl($str)
@@ -205,7 +205,7 @@ class OWNet
             $ret[$i] = $value;
         }
 
-        return($ret);
+        return $ret;
     }
 
     private function disconnect()
@@ -230,7 +230,7 @@ class OWNet
     {
         // connect with sockets or stream
         if ($this->link_connected) {
-            return(true);        // if connected don't continue
+            return true;   // if connected don't continue
         }
 
         if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {        // socket
@@ -240,29 +240,29 @@ class OWNet
                     @socket_set_block($this->link);                    // set it to blocking
                     $ok = @socket_connect($this->link, $this->host, $this->port);    // try to connect
                     if (!$ok) {
-                        $errno    = @socket_last_error();                // get error when connecting
-                        $errstr    = @socket_strerror(socket_last_error());
+                        $errno = @socket_last_error();                // get error when connecting
+                        $errstr = @socket_strerror(socket_last_error());
                         trigger_error(sprintf("Can't create socket [ow://%s:%d], errno: %d, error: %s", $this->host, $this->port, $errno, $errstr), E_USER_NOTICE);
                         @socket_shutdown($this->link, 2);            // unload socket
                         @socket_close($this->link);
                         $this->link = null;
-                        return(false);                        // return false on error or can't connect
+                        return false;                        // return false on error or can't connect
                     }    // socket created and connected
                 } else {
-                    $errno    = @socket_last_error();                    // get error when creating socket
-                    $errstr    = @socket_strerror(@socket_last_error());
+                    $errno = @socket_last_error();                    // get error when creating socket
+                    $errstr = @socket_strerror(@socket_last_error());
                     trigger_error(sprintf("Can't create socket [ow://%s:%d], errno: %d, error: %s", $this->host, $this->port, $errno, $errstr), E_USER_NOTICE);
-                    return(false);                            // return false on error or can't connect
+                    return false;                            // return false on error or can't connect
                 }
             } else {    // udp
                 $this->link = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);        // create socket
                 if ($this->link) {
                     @socket_set_block($this->link);                    // set it to blocking
                 } else {
-                    $errno    = @socket_last_error();                    // get error when creating socket
-                    $errstr    = @socket_strerror(@socket_last_error());
+                    $errno = @socket_last_error();                    // get error when creating socket
+                    $errstr = @socket_strerror(@socket_last_error());
                     trigger_error(sprintf("Can't create socket [ow-udp://%s:%d], errno: %d, error: %s", $this->host, $this->port, $errno, $errstr), E_USER_NOTICE);
-                    return(false);                            // return false on error or can't connect
+                    return false;                            // return false on error or can't connect
                 }
             }
         } else {                            // stream
@@ -285,20 +285,20 @@ class OWNet
                     ),
                     E_USER_NOTICE
                 );
-                return(false);                            // return false on error or can't connect
+                return false;                            // return false on error or can't connect
             }
         }
 
         $this->set_link_options();    // set socket options or stream options
         $this->link_connected = true;
-        return(true);            // ok
+        return true;            // ok
     }
 
     private function set_link_options()
     {
         // set link options
         if (!$this->link_connected) {
-            return(false);
+            return false;
         }
 
         if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {        // socket
@@ -319,7 +319,7 @@ class OWNet
             stream_set_write_buffer($this->link, 0);            // flush everything directly without buffer (faster than with buffer=8192)
         }
 
-        return(true);
+        return true;
     }
 
     private function get_msg($msg_size = 24)
@@ -342,7 +342,7 @@ class OWNet
             if ($num_changed_sockets === false) {    // error handling select
                 $this->disconnect();
                 trigger_error("Error handling get_msg#1", E_USER_NOTICE);
-                return(false);            // return false when have error
+                return false;            // return false when have error
             } elseif ($num_changed_sockets > 0) {    // we can read!
                 if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {
                     if ($this->sock_type == OWNET_LINK_TYPE_TCP) {
@@ -361,7 +361,7 @@ class OWNet
                 if ($read_data == '') {        // disconnected :'(
                     $this->disconnect();
                     trigger_error("Disconnected", E_USER_NOTICE);
-                    return(false);            // return false when have error
+                    return false;            // return false when have error
                 } else {
                     $last_read        = microtime(1);
                 }
@@ -376,7 +376,7 @@ class OWNet
             }
         }
 
-        return($read_data);            // return data
+        return $read_data;            // return data
     }
 
     private function send_msg($string)
@@ -384,7 +384,7 @@ class OWNet
         // return false on error and true on success, trigger error on disconnection
         // send message to server
         if (!$this->link_connected) {
-            return(false);
+            return false;
         }
 
         $num_changed_sockets = 0;
@@ -399,7 +399,7 @@ class OWNet
             if ($num_changed_sockets === false) {        // error handling
                 $this->disconnect();
                 trigger_error("Error handling send_msg#1", E_USER_NOTICE);
-                return(false);                // return false on error
+                return false;                // return false on error
             }
         }
 
@@ -421,34 +421,34 @@ class OWNet
                 // error sending
                 $this->disconnect();
                 trigger_error("Error writing send_msg#1", E_USER_NOTICE);
-                return(false);                // return false on error
+                return false;                // return false on error
             }
 
             $sent += $ret;    // add sent bytes
         }
 
-        return(true);        // ok everything sent
+        return true;        // ok everything sent
     }
 
     public function read($path, $parse_value = true)
     {
         // return NULL on error or no file
         // if $parse_value return php parsed value type (boolean,double,string), if not return an string value
-        return($this->get($path, OWNET_MSG_READ, false, $parse_value));        // return get with right flags
+        return $this->get($path, OWNET_MSG_READ, false, $parse_value);        // return get with right flags
     }
 
     public function dir($path)
     {
         // return NULL on error or no directory
         // return numeric array starting from 0 with directory list
-        return($this->get($path, OWNET_MSG_DIR_ALL, false, false));        // return get with right flags
+        return $this->get($path, OWNET_MSG_DIR_ALL, false, false);        // return get with right flags
     }
 
     public function presence($path)
     {
         // return NULL on error
         // return true or false on success
-        return($this->get($path, OWNET_MSG_PRESENCE, false, false));    // return get with right flags
+        return $this->get($path, OWNET_MSG_PRESENCE, false, false);    // return get with right flags
     }
 
     public function get($path = '/', $get_type = OWNET_MSG_READ, $return_full_info_array = false, $parse_php_type = true)
@@ -471,15 +471,15 @@ class OWNet
             // getting first read
             $ret = $this->get($path, OWNET_MSG_READ, $return_full_info_array, $parse_php_type);
             if ($ret !== null) {
-                return($ret);    // ok we get and result
+                return $ret;    // ok we get and result
             }
 
-            return($this->get($path, OWNET_MSG_DIR_ALL, $return_full_info_array, $parse_php_type));    // return dir
+            return $this->get($path, OWNET_MSG_DIR_ALL, $return_full_info_array, $parse_php_type);    // return dir
         }
 
         if ($get_type != OWNET_MSG_DIR && $get_type != OWNET_MSG_DIR_ALL) {
             if (substr($path, strlen($path) - 1, 1) == '/') {    // isn't a dir, dir must end with characters != '/'
-                return(null);
+                return null;
             }
         }
 
@@ -487,7 +487,7 @@ class OWNet
         $this->connect();        // try to connect
         if (!$this->link_connected) {
             trigger_error("Can't connect get#1", E_USER_NOTICE);
-            return(null);
+            return null;
         }
 
         // get value
@@ -502,12 +502,12 @@ class OWNet
 
         if ($this->send_msg($msg) === false) {
             trigger_error("Can't write to resource get#1", E_USER_NOTICE);
-            return(null);    // error sending
+            return null;    // error sending
         }
 
         if ($this->send_msg($path.chr(0)) === false) {
             trigger_error("Can't write to resource get#2", E_USER_NOTICE);
-            return(null);    // error sending
+            return null;    // error sending
         }
 
         if ($parse_php_type) {
@@ -526,7 +526,7 @@ class OWNet
                 if ($tmp_ret === false) {
                     trigger_error("Can't read from resource get#3", E_USER_NOTICE);
                     $this->disconnect();
-                    return(null);
+                    return null;
                 }
 
                 if (strlen($tmp_ret) > 0) {
@@ -543,22 +543,22 @@ class OWNet
             $ret = $this->unpack(substr($data, 0, 24));    // unpack 24bytes into 6 data
             if (count($ret) < 6) {
                 if ($get_type == OWNET_MSG_DIR_ALL) {    // old servers
-                    return($this->get($path, OWNET_MSG_DIR, $return_full_info_array, $parse_php_type));
+                    return $this->get($path, OWNET_MSG_DIR, $return_full_info_array, $parse_php_type);
                 }
 
                 $data = substr($data, 0, 24);
                 trigger_error("Error unpacking data get#1 [".strlen($data)."] ".$data, E_USER_NOTICE);
                 $this->disconnect();
-                return(null);
+                return null;
             }
 
             if ($get_type == OWNET_MSG_PRESENCE) {
                 // check presence
                 if (!isset($ret[2])) {
-                    return(null);    // error ?! maybe not (count < 6)
+                    return null;    // error ?! maybe not (count < 6)
                 }
 
-                return($ret[2] === 0);    // ret[2]!=0 => not present
+                return $ret[2] === 0;    // ret[2]!=0 => not present
             }
 
             $data = substr($data, 24);        // if any data was read with more than 24 bytes
@@ -581,7 +581,7 @@ class OWNet
                         if ($tmp_ret === false) {
                             trigger_error("Can't read from resource get#4", E_USER_NOTICE);    // error receiving
                             $this->disconnect();
-                            return(null);        // return NULL on error
+                            return null;        // return NULL on error
                         }
 
                         if (strlen($tmp_ret) > 0) {
@@ -599,7 +599,7 @@ class OWNet
                 if (!$return_full_info_array && strlen($data) != $data_len) {    // if just return value and data < data_len return as an error
                     trigger_error("Can't read full data get#1", E_USER_NOTICE);
                     $this->disconnect();
-                    return(null);        // return NULL on error
+                    return null;        // return NULL on error
                 }
 
                 if ($get_type == OWNET_MSG_DIR) {    // reading dir
@@ -683,9 +683,9 @@ class OWNet
                     }
 
                     if ($return_full_info_array) {
-                        return($ret);            // return array
+                        return $ret;            // return array
                     } else {
-                        return($ret['data_php']);    // return just php parsed value
+                        return $ret['data_php'];    // return just php parsed value
                     }
                 }
             } else {
@@ -695,7 +695,7 @@ class OWNet
 
         $this->disconnect();    // disconnect from server (dir listing)
         if ($get_type == OWNET_MSG_DIR_ALL && $return === null) {    // old servers
-            return($this->get($path, OWNET_MSG_DIR, $return_full_info_array, $parse_php_type));
+            return $this->get($path, OWNET_MSG_DIR, $return_full_info_array, $parse_php_type);
         }
 
         if ($return !== null) {
@@ -722,7 +722,7 @@ class OWNet
             }
         }
 
-        return($return);
+        return $return;
     }
 
     public function set($path, $value = '')
@@ -754,7 +754,7 @@ class OWNet
         if ($type !== false && $type[3] == 'ro') {
             // read only file
             trigger_error(sprintf('Read only value set#1 [%s]', $path), E_USER_NOTICE);
-            return(false);
+            return false;
             // return false on error
         }
 
@@ -764,7 +764,7 @@ class OWNet
         $this->connect();
         if (!$this->link_connected) {
             trigger_error("Can't connect set#1", E_USER_NOTICE);
-            return(false);        // return false on error
+            return false;        // return false on error
         }
 
         if (!is_string($value)) {
@@ -774,12 +774,12 @@ class OWNet
         $msg = $this->pack(OWNET_MSG_WRITE, strlen($path) + 1 + strlen($value) + 1, strlen($value) + 1);    // pack data
         if ($this->send_msg($msg) === false) {
             trigger_error("Can't write to resource set#1", E_USER_NOTICE);
-            return(false);    // error sending
+            return false;    // error sending
         }
 
         if ($this->send_msg($path.chr(0).$value.chr(0)) === false) {
             trigger_error("Can't write to resource set#2", E_USER_NOTICE);
-            return(false);    // error sending value
+            return false;    // error sending value
         }
 
         $data = '';
@@ -790,7 +790,7 @@ class OWNet
             if ($tmp_ret === false) {
                 trigger_error("Can't read from resource set#1", E_USER_NOTICE);
                 $this->disconnect();
-                return(false);    // error reading return
+                return false;    // error reading return
             }
 
             if (strlen($tmp_ret) > 0) {
@@ -808,7 +808,7 @@ class OWNet
         if (count($ret) < 6) {
             trigger_error("Error unpacking data set#1 [".strlen($data)."] ".$data, E_USER_NOTICE);
             $this->disconnect();
-            return(false);        // return false on error
+            return false;        // return false on error
         }
 
         if (!isset($ret[2])) {
@@ -821,17 +821,17 @@ class OWNet
 
         $this->disconnect();        // disconnect from server
         if ($ret !== false) {
-            return(true);        // very fine :)
+            return true;        // very fine :)
         }
 
-        return($ret);            // :(
+        return $ret;            // :(
     }
 
     private function unpack($data)
     {
         // unpack returned contents (24 bytes data)
         $unpack = $this->unpack_ntohl($data);
-        return($unpack);
+        return $unpack;
         // version= 0, payload_len=1, ret_value=2, format_flags=3, data_len=4, offset=5
     }
 
@@ -844,7 +844,7 @@ class OWNet
         $this->pack_htonl(258).
         $this->pack_htonl($data_len).
         $this->pack_htonl(0);
-        return($pack);
+        return $pack;
     }
 }
 
