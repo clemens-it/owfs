@@ -144,9 +144,9 @@ class OWNet
     {
         // host must be "anything://host:port" or "anything://host" OR 'anything that don't parse_url and get default values'
         // use "stream://host:port" or "ow-stream://host:port" to prefer stream instead sockets
-        $tmp_path    = @parse_url($host);    // get URL information from host
+        $tmp_path = @parse_url($host);    // get URL information from host
         if (!isset($tmp_path['scheme'])) {
-            $tmp_path    = @parse_url('tcp://' . $host);
+            $tmp_path = @parse_url('tcp://' . $host);
         }
 
         $this->host = $tmp_path['host'] ?? OWNET_DEFAULT_HOST; // if don't have host get default host
@@ -175,21 +175,21 @@ class OWNet
     {
         // return and URI that can be used with setHost again
         if ($this->link_type == OWNET_LINK_TYPE_STREAM) {
-            return 'ow-stream'.($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '').'://'.$this->host.':'.$this->port;  // using streams
+            return 'ow-stream' . ($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '') . '://' . $this->host . ':' . $this->port;  // using streams
         }
 
-        return 'ow'.($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '').'://'.$this->host.':'.$this->port;   // using sockets if possible
+        return 'ow' . ($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '') . '://' . $this->host . ':' . $this->port;   // using sockets if possible
     }
 
     protected function pack_htonl($val)
     {
         // builtin function to use htonl, big endian style
-        $bval    = str_pad(decbin(bcadd($val, 0, 0)), 8 * 4, '0', STR_PAD_LEFT);
-        $b1    = bindec(substr($bval, 0, 8));
-        $b2    = bindec(substr($bval, 8, 8));
-        $b3    = bindec(substr($bval, 16, 8));
-        $b4    = bindec(substr($bval, 24, 8));
-        return chr($b1).chr($b2).chr($b3).chr($b4);
+        $bval = str_pad(decbin(bcadd($val, 0, 0)), 8 * 4, '0', STR_PAD_LEFT);
+        $b1 = bindec(substr($bval, 0, 8));
+        $b2 = bindec(substr($bval, 8, 8));
+        $b3 = bindec(substr($bval, 16, 8));
+        $b4 = bindec(substr($bval, 24, 8));
+        return chr($b1) . chr($b2) . chr($b3) . chr($b4);
     }
 
     protected function unpack_ntohl($str)
@@ -197,13 +197,13 @@ class OWNet
         // builtin function to use ntohl, big endian style, not shure if it's right
         $size = strlen($str) / 4;
         $ret = [];
-        for ($i = 0;$i < $size;++$i) {
-            $bval    = substr($str, $i * 4, 4);
-            $b1    = ord(substr($bval, 0, 1));
-            $b2    = ord(substr($bval, 1, 1));
-            $b3    = ord(substr($bval, 2, 1));
-            $b4    = ord(substr($bval, 3, 1));
-            $value    = $b4 + ($b3 << 8) + ($b2 << 16) + ($b1 << 24);
+        for ($i = 0; $i < $size; ++$i) {
+            $bval = substr($str, $i * 4, 4);
+            $b1 = ord(substr($bval, 0, 1));
+            $b2 = ord(substr($bval, 1, 1));
+            $b3 = ord(substr($bval, 2, 1));
+            $b4 = ord(substr($bval, 3, 1));
+            $value = $b4 + ($b3 << 8) + ($b2 << 16) + ($b1 << 24);
             $ret[$i] = $value;
         }
 
@@ -268,9 +268,9 @@ class OWNet
                 }
             }
         } else {                            // stream
-            $this->link    = @stream_socket_client(
-                ($this->sock_type == OWNET_LINK_TYPE_TCP ? 'tcp://' : 'udp://').
-                $this->host.":".$this->port,
+            $this->link = @stream_socket_client(
+                ($this->sock_type == OWNET_LINK_TYPE_TCP ? 'tcp://' : 'udp://') .
+                    $this->host . ":" . $this->port,
                 $errno,
                 $errstr,
                 $this->timeout
@@ -328,9 +328,9 @@ class OWNet
     {
         // return false on error
         // get messagem from server
-        $num_changed_sockets    = 0;
-        $read_data        = '';
-        $last_read        = microtime(1);
+        $num_changed_sockets = 0;
+        $read_data = '';
+        $last_read = microtime(1);
         $t1 = (int) $this->timeout;
         $t2 = ($this->timeout * 1_000_000) % 1_000_000;
         while ($num_changed_sockets <= 0) {    // can loop forever? owserver must send something! or disconnect!
@@ -365,7 +365,7 @@ class OWNet
                     trigger_error("Disconnected", E_USER_NOTICE);
                     return false;            // return false when have error
                 } else {
-                    $last_read        = microtime(1);
+                    $last_read = microtime(1);
                 }
 
                 break;
@@ -507,7 +507,7 @@ class OWNet
             return null;    // error sending
         }
 
-        if ($this->send_msg($path.chr(0)) === false) {
+        if ($this->send_msg($path . chr(0)) === false) {
             trigger_error("Can't write to resource get#2", E_USER_NOTICE);
             return null;    // error sending
         }
@@ -549,7 +549,7 @@ class OWNet
                 }
 
                 $data = substr($data, 0, 24);
-                trigger_error("Error unpacking data get#1 [".strlen($data)."] ".$data, E_USER_NOTICE);
+                trigger_error("Error unpacking data get#1 [" . strlen($data) . "] " . $data, E_USER_NOTICE);
                 $this->disconnect();
                 return null;
             }
@@ -605,7 +605,7 @@ class OWNet
                 }
 
                 if ($get_type == OWNET_MSG_DIR) {    // reading dir
-                    $ret['data']    = $data;
+                    $ret['data'] = $data;
                     $ret['data_len'] = strlen($data);
                     $ret['data_php'] = substr($data, 0, $ret[4]);    // ret[4] is the right filename size ?! it's work :D
                     if ($return === null) {
@@ -620,28 +620,28 @@ class OWNet
 
                     // continue while...
                 } else {
-                    $ret['data']    = substr($data, 0, $data_len);    // data_php length is the same as $ret[2]
+                    $ret['data'] = substr($data, 0, $data_len);    // data_php length is the same as $ret[2]
                     $ret['data_len'] = strlen($data);
                     $this->disconnect();        // disconnect from server
                     $type = false;            // check type?
                     if ($parse_php_type && $get_type != OWNET_MSG_DIR_ALL) {
-                        $tmp        = explode('/', $path);
+                        $tmp = explode('/', $path);
                         $c = count($tmp) - 1;
                         if ($c > 0) {        // must be something like '/dir/file'    array('dir', 'file'), count()-1 = 1 > 0
-                            $variavel    = $tmp[$c];        // get last two uri args
-                            $ow        = $tmp[$c - 1];
+                            $variavel = $tmp[$c];        // get last two uri args
+                            $ow = $tmp[$c - 1];
                             unset($tmp);
                             if (preg_match('/([0-9A-F]{2})[\.]{0,1}[0-9A-F]{12}/', $ow, $tmp)) {    // check if ow is an OW id ("XX.ZZZZZZZZZZZZ or XXZZZZZZZZZZZZ")
                                 $tmp = $tmp[1];
-                                if (!isset($OWNET_GLOBAL_CACHE_STRUCTURE[$tmp.'/'.$variavel])) {    // check if we have structure information
+                                if (!isset($OWNET_GLOBAL_CACHE_STRUCTURE[$tmp . '/' . $variavel])) {    // check if we have structure information
                                     $tmp_v = @$this->get("/structure/$tmp/$variavel", OWNET_MSG_READ, false, false);    // get estrutucture information
                                     if ($tmp_v !== null) {
                                         $tmp_v = explode(',', $tmp_v);                        // ok :D we will get real php values now!
-                                        $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp.'/'.$variavel] = $tmp_v;
+                                        $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp . '/' . $variavel] = $tmp_v;
                                         $type = $tmp_v;
                                     }
                                 } else {
-                                    $type = $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp.'/'.$variavel];
+                                    $type = $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp . '/' . $variavel];
                                 }
                             }
                         }
@@ -680,7 +680,7 @@ class OWNet
                     }
 
                     if ($get_type == OWNET_MSG_DIR_ALL) {
-                        $return = & $ret;
+                        $return = &$ret;
                         break;
                     }
 
@@ -712,7 +712,7 @@ class OWNet
                     $tmp = explode(',', $return['data_php']);
                     $r = [];
                     $counter = count($tmp);
-                    for ($i = 0;$i < $counter;++$i) {
+                    for ($i = 0; $i < $counter; ++$i) {
                         $r[] = [0 => $return[0], 1 => $return[1], 2 => $return[2], 3 => $return[3], 4 => $return[4], 5 => $return[5], 'data' => $return['data'], 'data_len' => $return['data_len'], 'data_php' => $tmp[$i]];
                     }
 
@@ -731,24 +731,24 @@ class OWNet
     {
         // set and value to path checking before if path is readonly or not
         $path = trim($path);    // trim path
-        $tmp    = explode('/', $path);
+        $tmp = explode('/', $path);
         $c = count($tmp) - 1;
         $type = false;
         if ($c > 0) {    // try to get information about structure, if file is readonly or not
-            $variavel    = $tmp[$c];
-            $ow        = $tmp[$c - 1];
+            $variavel = $tmp[$c];
+            $ow = $tmp[$c - 1];
             unset($tmp);
             if (preg_match('/([0-9A-F]{2})[\.]{0,1}[0-9A-F]{12}/', $ow, $tmp)) {
                 $tmp = $tmp[1];
-                if (!isset($OWNET_GLOBAL_CACHE_STRUCTURE[$tmp.'/'.$variavel])) {
+                if (!isset($OWNET_GLOBAL_CACHE_STRUCTURE[$tmp . '/' . $variavel])) {
                     $tmp_v = @$this->get(sprintf('/structure/%s/%s', $tmp, $variavel), OWNET_MSG_READ, false, false);    // get estrutucture information
                     if ($tmp_v !== null) {
                         $tmp_v = explode(',', $tmp_v);
-                        $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp.'/'.$variavel] = $tmp_v;        // ok we will test it
+                        $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp . '/' . $variavel] = $tmp_v;        // ok we will test it
                         $type = $tmp_v;
                     }
                 } else {
-                    $type = $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp.'/'.$variavel];            // very fine, it was cached! :D performace boost
+                    $type = $OWNET_GLOBAL_CACHE_STRUCTURE[$tmp . '/' . $variavel];            // very fine, it was cached! :D performace boost
                 }
             }
         }
@@ -770,7 +770,7 @@ class OWNet
         }
 
         if (!is_string($value)) {
-            $value = (string)$value;    // be sure that's an string
+            $value = (string)$value;  // be sure that's an string
         }
 
         $msg = $this->pack(OWNET_MSG_WRITE, strlen($path) + 1 + strlen($value) + 1, strlen($value) + 1);    // pack data
@@ -779,14 +779,14 @@ class OWNet
             return false;    // error sending
         }
 
-        if ($this->send_msg($path.chr(0).$value.chr(0)) === false) {
+        if ($this->send_msg($path . chr(0) . $value . chr(0)) === false) {
             trigger_error("Can't write to resource set#2", E_USER_NOTICE);
             return false;    // error sending value
         }
 
         $data = '';
         $tmp_ret = '';
-        $start = microtime(1);    // start timeout counter
+        $start = microtime(1);   // start timeout counter
         while (1) {
             $tmp_ret = $this->get_msg(24);
             if ($tmp_ret === false) {
@@ -806,9 +806,9 @@ class OWNet
             }
         }
 
-        $ret = $this->unpack($data);    // unpack data return
+        $ret = $this->unpack($data);  // unpack data return
         if (count($ret) < 6) {
-            trigger_error("Error unpacking data set#1 [".strlen($data)."] ".$data, E_USER_NOTICE);
+            trigger_error("Error unpacking data set#1 [" . strlen($data) . "] " . $data, E_USER_NOTICE);
             $this->disconnect();
             return false;        // return false on error
         }
@@ -818,10 +818,10 @@ class OWNet
         }
 
         if ($ret[2] != 0) {
-            $ret = false;        // return false on error
+            $ret = false;       // return false on error
         }
 
-        $this->disconnect();        // disconnect from server
+        $this->disconnect();    // disconnect from server
         if ($ret !== false) {
             return true;        // very fine :)
         }
@@ -840,12 +840,12 @@ class OWNet
     private function pack($function, $payload_len, $data_len)
     {
         // pack msg information (24 bytes)
-        $pack =    $this->pack_htonl(0).
-        $this->pack_htonl($payload_len).
-        $this->pack_htonl($function).
-        $this->pack_htonl(258).
-        $this->pack_htonl($data_len).
-        $this->pack_htonl(0);
+        $pack = $this->pack_htonl(0) .
+            $this->pack_htonl($payload_len) .
+            $this->pack_htonl($function) .
+            $this->pack_htonl(258) .
+            $this->pack_htonl($data_len) .
+            $this->pack_htonl(0);
         return $pack;
     }
 }
