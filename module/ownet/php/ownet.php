@@ -149,12 +149,14 @@ class OWNet
             $tmp_path    = @parse_url('tcp://' . $host);
         }
 
-        $this->host    =    (isset($tmp_path['host']) ? $tmp_path['host'] : OWNET_DEFAULT_HOST);    // if don't have host get default host
-        $this->port    = (int)    (isset($tmp_path['port']) ? $tmp_path['port'] : OWNET_DEFAULT_PORT);    // if don't have port get default port
-        $prefer_sock    = (isset($tmp_path['scheme']) ?
-        ($tmp_path['scheme'] != 'stream' && $tmp_path['scheme'] != 'ow-stream' &&
-        $tmp_path['scheme'] != 'stream-udp' && $tmp_path['scheme'] != 'ow-stream-udp')
-        : true);    // check if prefer using streams instead socket
+        $this->host = $tmp_path['host'] ?? OWNET_DEFAULT_HOST; // if don't have host get default host
+        $this->port = (int) $tmp_path['port'] ?? OWNET_DEFAULT_PORT; // if don't have port get default port
+        $prefer_sock = (
+            isset($tmp_path['scheme'])
+            ? ($tmp_path['scheme'] != 'stream' && $tmp_path['scheme'] != 'ow-stream' &&
+                $tmp_path['scheme'] != 'stream-udp' && $tmp_path['scheme'] != 'ow-stream-udp')
+            : true
+        ); // check if prefer using streams instead socket
         $this->sock_type = strpos($tmp_path['scheme'], 'udp') !== false ? OWNET_LINK_TYPE_UDP : OWNET_LINK_TYPE_TCP;
 
         unset($tmp_path);
