@@ -92,7 +92,7 @@ if (!defined('IPPROTO_TCP')) {
     define('IPPROTO_TCP', 6);
 }
 
-$OWNET_GLOBAL_CACHE_STRUCTURE = array();    // cache value types length read write....
+$OWNET_GLOBAL_CACHE_STRUCTURE = [];    // cache value types length read write....
 class OWNet
 {
     protected $link = 0;
@@ -179,7 +179,7 @@ class OWNet
     {
         // builtin function to use ntohl, big endian style, not shure if it's right
         $size = strlen($str) / 4;
-        $ret = array();
+        $ret = [];
         for ($i = 0;$i < $size;$i++) {
             $bval    = substr($str, $i * 4, 4);
             $b1    = ord(substr($bval, 0, 1));
@@ -270,8 +270,8 @@ class OWNet
         if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {        // socket
             socket_set_block($this->link);                // set blocking mode
             if ($this->sock_type == OWNET_LINK_TYPE_TCP) {
-                socket_set_option($this->link, SOL_SOCKET, SO_RCVTIMEO, array("sec" => 0, "usec" => 100));    // receive timeout
-                socket_set_option($this->link, SOL_SOCKET, SO_SNDTIMEO, array("sec" => 0, "usec" => 100));    // send timeout
+                socket_set_option($this->link, SOL_SOCKET, SO_RCVTIMEO, ["sec" => 0, "usec" => 100]);    // receive timeout
+                socket_set_option($this->link, SOL_SOCKET, SO_SNDTIMEO, ["sec" => 0, "usec" => 100]);    // send timeout
                 socket_set_option($this->link, SOL_SOCKET, SO_REUSEADDR, 1);    // reuse address
                 socket_set_option($this->link, SOL_SOCKET, SO_OOBINLINE, 1);    // out off band inline
                 @socket_set_option($this->link, IPPROTO_TCP, TCP_NODELAY, 1);    // no delay  can have bug with windows?!
@@ -293,9 +293,9 @@ class OWNet
         $read_data        = '';
         $last_read        = microtime(1);
         $t1 = intval($this->timeout);
-        $t2 = ($this->timeout * 1000000) % 1000000;
+        $t2 = ($this->timeout * 1_000_000) % 1_000_000;
         while ($num_changed_sockets <= 0) {    // can loop forever? owserver must send something! or disconnect!
-            $read = array($this->link);
+            $read = [$this->link];
             if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {
                 $num_changed_sockets = socket_select($read, $write = null, $except = null, $t1, $t2);    // use socket_select
             } else {
@@ -345,7 +345,7 @@ class OWNet
         }
         $num_changed_sockets = 0;
         while ($num_changed_sockets <= 0) {
-            $write = array($this->link);
+            $write = [$this->link];
             if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {
                 $num_changed_sockets = socket_select($read = null, $write, $except = null, 0, 1000);    // use socket_select
             } else {
@@ -533,7 +533,7 @@ class OWNet
                     $ret['data_len'] = strlen($data);
                     $ret['data_php'] = substr($data, 0, $ret[4]);    // ret[4] is the right filename size ?! it's work :D
                     if ($return === null) {
-                        $return = array();    // se return as an array to get values
+                        $return = [];    // se return as an array to get values
                     }
                     if ($return_full_info_array) {
                         $return[] = $ret;        // return an array
@@ -579,7 +579,7 @@ class OWNet
                             if (bccmp($ret['data_php'], 0, 0) == -1) {
                                 $ret['data_php'] = substr($ret['data_php'], 1);        // be shure that it's unsigned
                             }
-                        } elseif (in_array($type[0], array('f','t',chr(152)))) {
+                        } elseif (in_array($type[0], ['f', 't', chr(152)])) {
                             $ret['data_php'] = (float)$ret['data_php'];    // using float (double) values, maybe sprinf("%.50f",$value) could get an string representation
                             if ($return_full_info_array) {
                                 if ($type[0] == 't') {            // temperature (last owserver versions... maybe an 'v' for volts and 'A' for amps could be implemented)
@@ -590,7 +590,7 @@ class OWNet
                                     }
                                 }
                             }
-                        } elseif (in_array($type[0], array('a','b','d'))) {
+                        } elseif (in_array($type[0], ['a', 'b', 'd'])) {
                             $ret['data_php'] = (string)$ret['data_php'];    // string (maybe without it could work too, but's it's pretty :D )
                         } elseif ($type[0] == 'y') {
                             $ret['data_php'] = ($ret['data_php'] == 1 ? true : false);    // boolean content
@@ -625,19 +625,9 @@ class OWNet
             if ($this->use_swig_dir == false && $get_type == OWNET_MSG_DIR_ALL) {
                 if ($return_full_info_array) {
                     $tmp = explode(',', $return['data_php']);
-                    $r = array();
+                    $r = [];
                     for ($i = 0;$i < count($tmp);$i++) {
-                        $r[] = array(
-                        0 => $return[0],
-                        1 => $return[1],
-                        2 => $return[2],
-                        3 => $return[3],
-                        4 => $return[4],
-                        5 => $return[5],
-                        'data' => $return['data'],
-                        'data_len' => $return['data_len'],
-                        'data_php' => $tmp[$i]
-                        );
+                        $r[] = [0 => $return[0], 1 => $return[1], 2 => $return[2], 3 => $return[3], 4 => $return[4], 5 => $return[5], 'data' => $return['data'], 'data_len' => $return['data_len'], 'data_php' => $tmp[$i]];
                     }
                     $return = $r;
                     unset($tmp, $r);
