@@ -335,10 +335,11 @@ class OWNet
         $t2 = ($this->timeout * 1_000_000) % 1_000_000;
         while ($num_changed_sockets <= 0) {    // can loop forever? owserver must send something! or disconnect!
             $read = [$this->link];
+            $w = $e = null;
             if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {
-                $num_changed_sockets = socket_select($read, $write = null, $except = null, $t1, $t2);    // use socket_select
+                $num_changed_sockets = socket_select($read, $w, $e, $t1, $t2);    // use socket_select
             } else {
-                $num_changed_sockets = stream_select($read, $write = null, $except = null, $t1, $t2);    // use stream_select
+                $num_changed_sockets = stream_select($read, $w, $e, $t1, $t2);    // use stream_select
             }
 
             if ($num_changed_sockets === false) {    // error handling select
@@ -392,10 +393,11 @@ class OWNet
         $num_changed_sockets = 0;
         while ($num_changed_sockets <= 0) {
             $write = [$this->link];
+            $r = $e = null;
             if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {
-                $num_changed_sockets = socket_select($read = null, $write, $except = null, 0, 1000);    // use socket_select
+                $num_changed_sockets = socket_select($r, $write, $e, 0, 1000);    // use socket_select
             } else {
-                $num_changed_sockets = stream_select($read = null, $write, $except = null, 0, 1000);    // use stream_select
+                $num_changed_sockets = stream_select($r, $write, $e, 0, 1000);    // use stream_select
             }
 
             if ($num_changed_sockets === false) {        // error handling
