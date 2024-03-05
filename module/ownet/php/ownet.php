@@ -149,17 +149,13 @@ class OWNet
             $tmp_path    = @parse_url('tcp://' . $host);
         }
 
-        $this->host    =    (!isset($tmp_path['host']) ? OWNET_DEFAULT_HOST : $tmp_path['host']);    // if don't have host get default host
-        $this->port    = (int)    (!isset($tmp_path['port']) ? OWNET_DEFAULT_PORT : $tmp_path['port']);    // if don't have port get default port
+        $this->host    =    (isset($tmp_path['host']) ? $tmp_path['host'] : OWNET_DEFAULT_HOST);    // if don't have host get default host
+        $this->port    = (int)    (isset($tmp_path['port']) ? $tmp_path['port'] : OWNET_DEFAULT_PORT);    // if don't have port get default port
         $prefer_sock    = (isset($tmp_path['scheme']) ?
         ($tmp_path['scheme'] != 'stream' && $tmp_path['scheme'] != 'ow-stream' &&
         $tmp_path['scheme'] != 'stream-udp' && $tmp_path['scheme'] != 'ow-stream-udp')
         : true);    // check if prefer using streams instead socket
-        if (strpos($tmp_path['scheme'], 'udp') !== false) {
-            $this->sock_type = OWNET_LINK_TYPE_UDP;
-        } else {
-            $this->sock_type = OWNET_LINK_TYPE_TCP;
-        }
+        $this->sock_type = strpos($tmp_path['scheme'], 'udp') !== false ? OWNET_LINK_TYPE_UDP : OWNET_LINK_TYPE_TCP;
 
         unset($tmp_path);
 
@@ -333,7 +329,7 @@ class OWNet
         $num_changed_sockets    = 0;
         $read_data        = '';
         $last_read        = microtime(1);
-        $t1 = intval($this->timeout);
+        $t1 = (int) $this->timeout;
         $t2 = ($this->timeout * 1_000_000) % 1_000_000;
         while ($num_changed_sockets <= 0) {    // can loop forever? owserver must send something! or disconnect!
             $read = [$this->link];
@@ -675,7 +671,7 @@ class OWNet
                         } elseif (in_array($type[0], ['a', 'b', 'd'])) {
                             $ret['data_php'] = (string)$ret['data_php'];    // string (maybe without it could work too, but's it's pretty :D )
                         } elseif ($type[0] == 'y') {
-                            $ret['data_php'] = ($ret['data_php'] == 1 ? true : false);    // boolean content
+                            $ret['data_php'] = ($ret['data_php'] == 1);    // boolean content
                         }    // another contents are parsed as string too
                     } else {
                         $ret['data_php'] = &$ret['data'];        // we will use not parsed values (we use it when getting structure information! or setting $parse_php_type=false)
@@ -713,7 +709,8 @@ class OWNet
                 if ($return_full_info_array) {
                     $tmp = explode(',', $return['data_php']);
                     $r = [];
-                    for ($i = 0;$i < count($tmp);++$i) {
+                    $counter = count($tmp);
+                    for ($i = 0;$i < $counter;++$i) {
                         $r[] = [0 => $return[0], 1 => $return[1], 2 => $return[2], 3 => $return[3], 4 => $return[4], 5 => $return[5], 'data' => $return['data'], 'data_len' => $return['data_len'], 'data_php' => $tmp[$i]];
                     }
 
@@ -754,11 +751,11 @@ class OWNet
             }
         }
 
-        if ($type !== false) {
-            if ($type[3] == 'ro') {    // read only file
-                trigger_error(sprintf('Read only value set#1 [%s]', $path), E_USER_NOTICE);
-                return(false);    // return false on error
-            }
+        if ($type !== false && $type[3] == 'ro') {
+            // read only file
+            trigger_error(sprintf('Read only value set#1 [%s]', $path), E_USER_NOTICE);
+            return(false);
+            // return false on error
         }
 
         unset($type, $tmp, $tmp_v, $variavel, $ow, $c);
