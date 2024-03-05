@@ -291,9 +291,9 @@ class OWNet
             }
         }
 
-        $this->set_link_options();    // set socket options or stream options
         $this->link_connected = true;
-        return true;            // ok
+        $this->set_link_options();                       // set socket options or stream options
+        return true;                                    // ok
     }
 
     private function set_link_options()
