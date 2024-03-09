@@ -96,28 +96,28 @@ if (!defined('IPPROTO_TCP')) {
 $OWNET_GLOBAL_CACHE_STRUCTURE = [];    // cache value types length read write....
 class OWNet
 {
-	/**
-	 * link to socket (type class Socket) or stream (type resource)
-	 * 
-	 * @var resource|object
-	 */
-	protected mixed $link = null;
+    /**
+     * link to socket (type class Socket) or stream (type resource)
+     * 
+     * @var resource|object
+     */
+    protected mixed $link = null;
 
-	protected string $host = '';
+    protected string $host = '';
 
-	protected int $port = 0;
+    protected int $port = 0;
 
-	protected int $sock_type = OWNET_LINK_TYPE_TCP;
+    protected int $sock_type = OWNET_LINK_TYPE_TCP;
 
-	protected int $link_type = OWNET_LINK_TYPE_SOCKET;
+    protected int $link_type = OWNET_LINK_TYPE_SOCKET;
 
-	protected bool $link_connected = false;
+    protected bool $link_connected = false;
 
-	protected float $timeout = 0;
+    protected float $timeout = 0;
 
-	protected bool $use_swig_dir = true;
+    protected bool $use_swig_dir = true;
 
-	public function __construct(string $host = '', float $timeout = 5, bool $use_swig_dir = true)
+    public function __construct(string $host = '', float $timeout = 5, bool $use_swig_dir = true)
     {
         // just set default configurations
         $this->setHost($host);
@@ -125,27 +125,27 @@ class OWNet
         $this->use_swig_dir = (bool)$use_swig_dir;
     }
 
-	public function setTimeout(float $timeout = 5): void
+    public function setTimeout(float $timeout = 5): void
     {
         $this->timeout = abs((float)$timeout);
     }
 
-	public function getTimeout(): float
+    public function getTimeout(): float
     {
         return $this->timeout;
     }
 
-	public function setUseSwigDir($use): void
+    public function setUseSwigDir($use): void
     {
         $this->use_swig_dir = (bool)$use;
     }
 
-	public function getUseSwigDir(): bool
+    public function getUseSwigDir(): bool
     {
         return $this->use_swig_dir;
     }
 
-	public function setHost(string $host = ''): bool
+    public function setHost(string $host = ''): bool
     {
         // host must be "anything://host:port" or "anything://host" OR 'anything that don't parse_url and get default values'
         // use "stream://host:port" or "ow-stream://host:port" to prefer stream instead sockets
@@ -172,11 +172,11 @@ class OWNet
             $this->link_type = OWNET_LINK_TYPE_STREAM;    // prefer stream
         }
 
-		$this->link_connected = false;
+        $this->link_connected = false;
         return true;
     }
 
-	public function getHost(): string
+    public function getHost(): string
     {
         // return and URI that can be used with setHost again
         if ($this->link_type == OWNET_LINK_TYPE_STREAM) {
@@ -186,7 +186,7 @@ class OWNet
         return 'ow' . ($this->sock_type == OWNET_LINK_TYPE_UDP ? '-udp' : '') . '://' . $this->host . ':' . $this->port;   // using sockets if possible
     }
 
-	protected function pack_htonl(string $val): string
+    protected function pack_htonl(string $val): string
     {
         // builtin function to use htonl, big endian style
         $bval = str_pad(decbin(bcadd($val, 0, 0)), 8 * 4, '0', STR_PAD_LEFT);
@@ -197,9 +197,9 @@ class OWNet
         return chr($b1) . chr($b2) . chr($b3) . chr($b4);
     }
 
-	protected function unpack_ntohl(string $str): array
+    protected function unpack_ntohl(string $str): array
     {
-		// builtin function to use ntohl, big endian style, not sure if it's right
+        // builtin function to use ntohl, big endian style, not sure if it's right
         $size = strlen($str) / 4;
         $ret = [];
         for ($i = 0; $i < $size; ++$i) {
@@ -215,12 +215,12 @@ class OWNet
         return $ret;
     }
 
-	private function disconnect(): void
+    private function disconnect(): void
     {
         // disconnect link
-		if (!$this->link_connected) {
-			return;
-		}
+        if (!$this->link_connected) {
+            return;
+        }
 
         if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {        // socket
             @socket_set_block($this->link);
@@ -237,7 +237,7 @@ class OWNet
         $this->link_connected = false;
     }
 
-	private function connect(): bool
+    private function connect(): bool
     {
         // connect with sockets or stream
         if ($this->link_connected) {
@@ -305,7 +305,7 @@ class OWNet
         return true;                                    // ok
     }
 
-	private function set_link_options(): bool
+    private function set_link_options(): bool
     {
         // set link options
         if (!$this->link_connected) {
@@ -319,7 +319,7 @@ class OWNet
                 socket_set_option($this->link, SOL_SOCKET, SO_SNDTIMEO, ["sec" => 0, "usec" => 100]);    // send timeout
                 socket_set_option($this->link, SOL_SOCKET, SO_REUSEADDR, 1);    // reuse address
                 socket_set_option($this->link, SOL_SOCKET, SO_OOBINLINE, 1);    // out off band inline
-				@socket_set_option($this->link, IPPROTO_TCP, TCP_NODELAY, 1);   // no delay  can have bug with windows?!
+                @socket_set_option($this->link, IPPROTO_TCP, TCP_NODELAY, 1);   // no delay  can have bug with windows?!
             }
 
             socket_set_option($this->link, SOL_SOCKET, SO_RCVBUF, 8192);    // set receive buffer
@@ -327,16 +327,16 @@ class OWNet
         } else {
             stream_set_timeout($this->link, 20);            // set timeout
             stream_set_blocking($this->link, 1);            // set blocking mode
-			stream_set_write_buffer($this->link, 0);        // flush everything directly without buffer (faster than with buffer=8192)
+            stream_set_write_buffer($this->link, 0);        // flush everything directly without buffer (faster than with buffer=8192)
         }
 
         return true;
     }
 
-	private function get_msg(int $msg_size = 24)
+    private function get_msg(int $msg_size = 24)
     {
         // return false on error
-		// get message from server
+        // get message from server
         $num_changed_sockets = 0;
         $read_data = '';
         $last_read = microtime(1);
@@ -391,7 +391,7 @@ class OWNet
         return $read_data;            // return data
     }
 
-	private function send_msg(string $string): bool
+    private function send_msg(string $string): bool
     {
         // return false on error and true on success, trigger error on disconnection
         // send message to server
@@ -422,7 +422,7 @@ class OWNet
             // we will not use select, using can be slower, and without work! :D
             if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {
                 if ($this->sock_type == OWNET_LINK_TYPE_TCP) {
-					$ret = socket_write($this->link, $string, strlen($string));    // write and get sent bytes
+                    $ret = socket_write($this->link, $string, strlen($string));    // write and get sent bytes
                 } else {
                     $ret = socket_sendto($this->link, $string, strlen($string), 0, $this->host, $this->port);    // write and get sent bytes
                 }
@@ -443,14 +443,14 @@ class OWNet
         return true;        // ok everything sent
     }
 
-	public function read(string $path, bool $parse_value = true)
+    public function read(string $path, bool $parse_value = true)
     {
         // return NULL on error or no file
         // if $parse_value return php parsed value type (boolean,double,string), if not return an string value
         return $this->get($path, OWNET_MSG_READ, false, $parse_value);        // return get with right flags
     }
 
-	public function dir(string $path)
+    public function dir(string $path)
     {
         // return NULL on error or no directory
         // return numeric array starting from 0 with directory list
@@ -464,7 +464,7 @@ class OWNet
         return $this->get($path, OWNET_MSG_PRESENCE, false, false);    // return get with right flags
     }
 
-	public function get(string $path = '/', int $get_type = OWNET_MSG_READ, bool $return_full_info_array = false, bool $parse_php_type = true): array|string|null
+    public function get(string $path = '/', int $get_type = OWNET_MSG_READ, bool $return_full_info_array = false, bool $parse_php_type = true): array|string|null
     {
         // return NULL on error
         // path = path of file or directory
@@ -472,7 +472,7 @@ class OWNet
         //        OWNET_MSG_READ        read an file
         //        OWNET_MSG_DIR or OWNET_MSG_DIR_ALL        read an directory (output is an array)
         //        OWNET_MSG_PRESENCE    check presence output is true or false
-		// return_full_info_array    if true return everything from communication and unit if variables is an temperature, ['data'] is returned data and ['data_php'] is an parsed data in (double) or (string) types
+        // return_full_info_array    if true return everything from communication and unit if variables is an temperature, ['data'] is returned data and ['data_php'] is an parsed data in (double) or (string) types
         // parse_php_type        if true try to get right data_php variable type
 
         // return NULL on error or not founded
@@ -491,12 +491,12 @@ class OWNet
         }
 
         if ($get_type != OWNET_MSG_DIR && $get_type != OWNET_MSG_DIR_ALL) {
-			if (substr($path, -1, 1) == '/') {    // isn't a dir, dir must end with characters != '/'
+            if (substr($path, -1, 1) == '/') {    // isn't a dir, dir must end with characters != '/'
                 return null;
             }
         }
 
-		$this->disconnect();     // be sure that we are disconnected
+        $this->disconnect();     // be sure that we are disconnected
         $this->connect();        // try to connect
         if (!$this->link_connected) {
             trigger_error("Can't connect get#1", E_USER_NOTICE);
@@ -603,7 +603,7 @@ class OWNet
 
                         $data .= $tmp_ret;
                         unset($tmp_ret);
-						if (strlen($data) >= $data_len || (microtime(1) - $start) > $this->timeout) {    // timed out or got every data that we need
+                        if (strlen($data) >= $data_len || (microtime(1) - $start) > $this->timeout) {    // timed out or got every data that we need
                             break;
                         }
                     }
@@ -620,7 +620,7 @@ class OWNet
                     $ret['data_len'] = strlen($data);
                     $ret['data_php'] = substr($data, 0, $ret[4]);    // ret[4] is the right filename size ?! it's work :D
                     if ($return === null) {
-						$return = [];    // set $return as an array to get values
+                        $return = [];    // set $return as an array to get values
                     }
 
                     if ($return_full_info_array) {
@@ -682,7 +682,7 @@ class OWNet
                                 }
                             }
                         } elseif (in_array($type[0], ['a', 'b', 'd'])) {
-							$ret['data_php'] = (string)$ret['data_php'];    // string (maybe without it could work too, but it's pretty :D )
+                            $ret['data_php'] = (string)$ret['data_php'];    // string (maybe without it could work too, but it's pretty :D )
                         } elseif ($type[0] == 'y') {
                             $ret['data_php'] = ($ret['data_php'] == 1);    // boolean content
                         }    // another contents are parsed as string too
@@ -738,7 +738,7 @@ class OWNet
         return $return;
     }
 
-	public function set(string $path, $value = ''): bool
+    public function set(string $path, $value = ''): bool
     {
         // set and value to path checking before if path is readonly or not
         $path = trim($path);    // trim path
@@ -840,14 +840,14 @@ class OWNet
         return $ret;            // :(
     }
 
-	private function unpack(string $data): array
+    private function unpack(string $data): array
     {
         // unpack returned contents (24 bytes data)
         // version= 0, payload_len=1, ret_value=2, format_flags=3, data_len=4, offset=5
-		return $this->unpack_ntohl($data);
+        return $this->unpack_ntohl($data);
     }
 
-	private function pack(int $function, int $payload_len, int $data_len): string
+    private function pack(int $function, int $payload_len, int $data_len): string
     {
         // pack msg information (24 bytes)
         $pack = $this->pack_htonl(0) .
