@@ -360,7 +360,8 @@ class OWNet
                     if ($this->sock_type == OWNET_LINK_TYPE_TCP) {
                         $read_data = socket_read($this->link, $msg_size, PHP_BINARY_READ);    // read with sockets
                     } else {
-                        $ret = socket_recvfrom($this->link, $read_data, $msg_size, $tmp_host, $tmp_port);    // read with sockets
+                        $flags = 0;
+                        $ret = socket_recvfrom($this->link, $read_data, $msg_size, $flags, $tmp_host, $tmp_port);    // read with sockets
                         if ($ret > 0) {
                             $this->host = $tmp_host;
                             $this->port = $tmp_port;
