@@ -336,7 +336,7 @@ class OWNet
 	private function get_msg(int $msg_size = 24)
     {
         // return false on error
-        // get messagem from server
+		// get message from server
         $num_changed_sockets = 0;
         $read_data = '';
         $last_read = microtime(1);
@@ -491,7 +491,7 @@ class OWNet
         }
 
         if ($get_type != OWNET_MSG_DIR && $get_type != OWNET_MSG_DIR_ALL) {
-            if (substr($path, strlen($path) - 1, 1) == '/') {    // isn't a dir, dir must end with characters != '/'
+			if (substr($path, -1, 1) == '/') {    // isn't a dir, dir must end with characters != '/'
                 return null;
             }
         }
@@ -843,9 +843,8 @@ class OWNet
 	private function unpack(string $data): array
     {
         // unpack returned contents (24 bytes data)
-        $unpack = $this->unpack_ntohl($data);
-        return $unpack;
         // version= 0, payload_len=1, ret_value=2, format_flags=3, data_len=4, offset=5
+		return $this->unpack_ntohl($data);
     }
 
 	private function pack(int $function, int $payload_len, int $data_len): string
