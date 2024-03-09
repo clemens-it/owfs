@@ -218,6 +218,10 @@ class OWNet
 	private function disconnect(): void
     {
         // disconnect link
+		if (!$this->link_connected) {
+			return;
+		}
+
         if ($this->link_type == OWNET_LINK_TYPE_SOCKET) {        // socket
             @socket_set_block($this->link);
             if ($this->sock_type == OWNET_LINK_TYPE_TCP) {
