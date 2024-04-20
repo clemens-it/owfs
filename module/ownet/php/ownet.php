@@ -367,10 +367,6 @@ class OWNet
                         $msg_size = 65_507; 
                         $flags = 0;
                         $ret = socket_recvfrom($this->link, $read_data, $msg_size, $flags, $tmp_host, $tmp_port);    // read with sockets
-                        if ($ret > 0) {
-                            $this->host = $tmp_host;
-                            $this->port = $tmp_port;
-                        }
                     }
                 } else {
                     $read_data = fread($this->link, $msg_size);            // read with streams
