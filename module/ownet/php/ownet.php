@@ -360,6 +360,11 @@ class OWNet
                     if ($this->sock_type == OWNET_LINK_TYPE_TCP) {
                         $read_data = socket_read($this->link, $msg_size, PHP_BINARY_READ);    // read with sockets
                     } else {
+                        //payload data of a UDP datagram needs to be read entirely from the socket at once;
+                        //otherwise, the remaining part of the data will be discarded.
+                        //maximum UDP payload size over IPv4 is 65,507 bytes (65535 - 20 IP header - 8 UDP header),
+                        //UDP over IPv6 is 20 bytes less
+                        $msg_size = 65_507; 
                         $flags = 0;
                         $ret = socket_recvfrom($this->link, $read_data, $msg_size, $flags, $tmp_host, $tmp_port);    // read with sockets
                         if ($ret > 0) {
