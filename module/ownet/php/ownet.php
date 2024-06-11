@@ -466,7 +466,7 @@ class OWNet
         return $this->get($path, OWNET_MSG_PRESENCE, false, false);    // return get with right flags
     }
 
-    public function get(string $path = '/', int $get_type = OWNET_MSG_READ, bool $return_full_info_array = false, bool $parse_php_type = true): array|string|null
+    public function get(string $path = '/', int $get_type = OWNET_MSG_READ, bool $return_full_info_array = false, bool $parse_php_type = true): array|string|null|bool
     {
         // return NULL on error
         // path = path of file or directory
@@ -477,7 +477,7 @@ class OWNet
         // return_full_info_array    if true return everything from communication and unit if variables is an temperature, ['data'] is returned data and ['data_php'] is an parsed data in (double) or (string) types
         // parse_php_type        if true try to get right data_php variable type
 
-        // return NULL on error or not founded
+        // return NULL on error or not found
         // return an array on OWNET_MSG_DIR or when return_full_info_array=true
         // return true or false when OWNET_MSG_PRESENCE
 
