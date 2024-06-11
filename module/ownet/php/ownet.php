@@ -669,8 +669,8 @@ class OWNet
                             $ret['data_php'] = bcadd($ret['data_php'], 0, 0);    // integer (using bcmath for bigger precision)
                         } elseif ($type[0] == 'u') {
                             $ret['data_php'] = bcadd($ret['data_php'], 0, 0);    // unsigned integer (using bcmath for bigger precision)
-                            if (bccmp($ret['data_php'], 0, 0) == -1) {
-                                $ret['data_php'] = substr($ret['data_php'], 1);        // be shure that it's unsigned
+                            if (bccomp($ret['data_php'], 0, 0) == -1) {
+                                $ret['data_php'] = substr($ret['data_php'], 1);        // be sure that it's unsigned
                             }
                         } elseif (in_array($type[0], ['f', 't', chr(152)])) {
                             $ret['data_php'] = (float)$ret['data_php'];    // using float (double) values, maybe sprinf("%.50f",$value) could get an string representation
